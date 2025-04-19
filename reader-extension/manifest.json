@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Reader Mode",
+  "version": "1.0.0",
+  "description": "Simplifies web pages for easier reading",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["main.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
+
+
+  
