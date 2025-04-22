@@ -1,10 +1,17 @@
 console.log("Reader Mode extension loaded!");
 
+if (typeof Readability === "undefined") {
+  const script = document.createElement("script");
+  script.src = "https://unpkg.com/@mozilla/readability@0.4.4/Readability.js";
+  script.onload = () => console.log("Readability loaded.");
+  document.head.appendChild(script);
+}
+
 const toggleWrapper = document.createElement("div");
 toggleWrapper.id = "reader-mode-toggle-wrapper";
 toggleWrapper.style.position = "fixed";
-toggleWrapper.style.top = "80px";
-toggleWrapper.style.right = "10px";
+toggleWrapper.style.top = "250px";
+toggleWrapper.style.right = "20px";
 toggleWrapper.style.zIndex = "9999";
 
 const toggleButton = document.createElement("button");
@@ -23,71 +30,62 @@ document.body.appendChild(toggleWrapper);
 let readerModeEnabled = false;
 let originalBodyHTML = document.body.innerHTML;
 
-function getMainContentElement() {
-    const candidates = [
-        document.querySelector("article"),
-        document.querySelector("main"),
-        document.querySelector("[role=main]"),
-        document.querySelector(".post, .entry-content, .article-body, .main-content"),
-    ];
+function removeAdBlocks() {
+  document.querySelectorAll('[id*="ad-"], [class*="ad-"], [class*="adsninja"], [class*="adzone"]').forEach(el => el.remove());
 
-    for (let el of candidates) {
-        if (el && el.innerText.length > 300) return el;
+  document.querySelectorAll('.ad-zone-container, .ad-zone, .ad-loading, .an-zone-tag-top, .an-zone-tag-bottom, .dynamically-injected-refresh-ad-zone').forEach(el => el.remove());
+
+  document.querySelectorAll('iframe, script').forEach(el => {
+    const src = el.src || '';
+    if (src.includes('ads') || src.includes('doubleclick') || src.includes('googletag')) {
+      el.remove();
     }
-
-    let largest = null;
-    let maxTextLength = 0;
-    const allDivs = document.querySelectorAll("div");
-
-    allDivs.forEach(div => {
-        const text = div.innerText.trim();
-        const visible = div.offsetWidth > 0 && div.offsetHeight > 0;
-        if (visible && text.length > maxTextLength) {
-            maxTextLength = text.length;
-            largest = div;
-        }
-    });
-
-    return largest;
+  });
 }
 
 function enableReaderMode() {
-    const mainContent = getMainContentElement();
+  if (typeof Readability === "undefined") {
+    alert("Readability.js not loaded yet. Please wait a few seconds and try again.");
+    return;
+  }
 
-    if (!mainContent) {
-        alert("Couldn't find main content.");
-        return;
-    }
+  originalBodyHTML = document.body.innerHTML;
 
-    originalBodyHTML = document.body.innerHTML;
+  removeAdBlocks();
 
-    const readerHTML = `
-        <div id="reader-mode-container" style="padding: 2rem; font-family: Georgia, serif; max-width: 800px; margin: auto; line-height: 1.6; font-size: 1.1rem; color: #222;">
-            ${mainContent.innerHTML}
-        </div>
-    `;
-    document.body.innerHTML = readerHTML;
+  const article = new Readability(document.cloneNode(true)).parse();
 
-    document.body.appendChild(toggleWrapper);
+  if (!article || !article.content) {
+    alert("Failed to extract readable content.");
+    return;
+  }
+
+  const readerHTML = `
+    <div id="reader-mode-container" style="padding: 2rem; font-family: Georgia, serif; max-width: 800px; margin: auto; line-height: 1.6; font-size: 1.1rem; color: #222;">
+      <h1>${article.title}</h1>
+      ${article.content}
+    </div>
+  `;
+
+  document.body.innerHTML = readerHTML;
+
+  document.body.appendChild(toggleWrapper);
 }
 
 function disableReaderMode() {
-    document.body.innerHTML = originalBodyHTML;
-
-    document.body.appendChild(toggleWrapper);
+  document.body.innerHTML = originalBodyHTML;
+  document.body.appendChild(toggleWrapper);
 }
 
 toggleButton.addEventListener("click", () => {
-    if (!readerModeEnabled) {
-        enableReaderMode();
-        toggleButton.textContent = "❌ Exit Reader Mode";
-    } else {
-        disableReaderMode();
-        toggleButton.textContent = "📰 Reader Mode";
-    }
-    readerModeEnabled = !readerModeEnabled;
+  if (!readerModeEnabled) {
+    enableReaderMode();
+    toggleButton.textContent = "❌ Exit Reader Mode";
+  } else {
+    disableReaderMode();
+    toggleButton.textContent = "📰 Reader Mode";
+  }
+  readerModeEnabled = !readerModeEnabled;
 });
-
-
 
   
