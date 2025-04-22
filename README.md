@@ -6,7 +6,7 @@ This project is a custom **Reader Mode extension** built for the [Webfuse](https
 
 - 📄 Extracts main readable content from any webpage
 - 🖱 Toggle Reader Mode on/off with a floating button
-- 🧠 Smart content detection using semantic tags + heuristics
+- 🧠 Smart content detection using semantic tags 
 - 🧹 Removes sidebars, ads, and clutter
 - 🔁 Fully reversible — toggle off to return to original layout
 
