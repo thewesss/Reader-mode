@@ -61,7 +61,7 @@ function enableReaderMode() {
   }
 
   const readerHTML = `
-    <div id="reader-mode-container" style="padding: 2rem; font-family: Georgia, serif; max-width: 800px; margin: auto; line-height: 1.6; font-size: 1.1rem; color: #222;">
+    <div id="reader-mode-container" style="padding: 2rem; font-family: Georgia, serif; max-width: 800px; margin: auto; line-height: 1.6; font-size: 1.2rem; color: #222;">
       <h1>${article.title}</h1>
       ${article.content}
     </div>
