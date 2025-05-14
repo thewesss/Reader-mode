@@ -1,5 +1,7 @@
+// Confirms if the Reader-mode has loaded
 console.log("Reader Mode extension loaded!");
 
+// Dynamically load Readability.js if it's not already available
 if (typeof Readability === "undefined") {
   const script = document.createElement("script");
   script.src = "https://unpkg.com/@mozilla/readability@0.4.4/Readability.js";
@@ -7,6 +9,7 @@ if (typeof Readability === "undefined") {
   document.head.appendChild(script);
 }
 
+// UI SETUP: Reader Mode Toggle Button
 const toggleWrapper = document.createElement("div");
 toggleWrapper.id = "reader-mode-toggle-wrapper";
 toggleWrapper.style.position = "fixed";
@@ -27,9 +30,13 @@ toggleButton.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
 toggleWrapper.appendChild(toggleButton);
 document.body.appendChild(toggleWrapper);
 
+// STATE VARIABLES
 let readerModeEnabled = false;
 let originalBodyHTML = document.body.innerHTML;
 
+
+// FUNCTION: removeAdBlocks
+// Description: Removes common ad elements from the DOM
 function removeAdBlocks() {
   document.querySelectorAll('[id*="ad-"], [class*="ad-"], [class*="adsninja"], [class*="adzone"]').forEach(el => el.remove());
 
@@ -43,6 +50,8 @@ function removeAdBlocks() {
   });
 }
 
+// FUNCTION: enableReaderMode
+// Description: Parses readable content using Readability and replaces the page content
 function enableReaderMode() {
   if (typeof Readability === "undefined") {
     alert("Readability.js not loaded yet. Please wait a few seconds and try again.");
@@ -72,10 +81,16 @@ function enableReaderMode() {
   document.body.appendChild(toggleWrapper);
 }
 
+// FUNCTION: disableReaderMode
+// Description: Restores the original page content
+
 function disableReaderMode() {
   document.body.innerHTML = originalBodyHTML;
   document.body.appendChild(toggleWrapper);
 }
+
+// EVENT HANDLER: Toggle Button Click
+// Description: Enables/disables reader mode
 
 toggleButton.addEventListener("click", () => {
   if (!readerModeEnabled) {
@@ -87,5 +102,6 @@ toggleButton.addEventListener("click", () => {
   }
   readerModeEnabled = !readerModeEnabled;
 });
+
 
   
